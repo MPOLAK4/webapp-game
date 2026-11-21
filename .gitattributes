@@ -1,0 +1,2 @@
+# Tests are for development only: leave them out of `git archive` release bundles.
+tests/ export-ignore
