@@ -1,0 +1,8 @@
+# Never commit these (public repo)
+*.jsonl
+.env
+.env.*
+.venv/
+node_modules/
+__pycache__/
+*.pyc
