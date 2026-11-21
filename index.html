@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dino Game</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #fff;
+      color: #535353;
+      font-family: "Courier New", monospace;
+    }
+    canvas {
+      width: min(95vw, 900px);
+      height: auto;
+      aspect-ratio: 600 / 150;
+      image-rendering: pixelated; /* keeps the blocky pixel art crisp when scaled up */
+    }
+    p { margin: 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="600" height="150" role="img"
+          aria-label="Dinosaur game: Space or Up Arrow to jump, Down Arrow to duck"></canvas>
+  <p>Space or &uarr; to jump &middot; &darr; to duck</p>
+
+  <!-- Plain scripts (not modules) so this page also works when opened as a file. -->
+  <script src="storage.js"></script>
+  <script src="game.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
