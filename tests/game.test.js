@@ -89,8 +89,12 @@ test('R1.4: duck in the air keeps the size but makes the dinosaur fall faster', 
     G.press(g, 'jump');
     if (holdDuck) G.press(g, 'duck');
     let steps = 0;
-    do { G.update(g, STEP); steps++; } while (g.dino.y > 0 && steps < 300);
-    if (holdDuck) assert.deepEqual(G.getDinoSize(g.dino), { w: 44, h: 47 });
+    do {
+      G.update(g, STEP);
+      steps++;
+      // While still in the air, holding duck must not shrink the dinosaur.
+      if (g.dino.y > 0) assert.deepEqual(G.getDinoSize(g.dino), { w: 44, h: 47 });
+    } while (g.dino.y > 0 && steps < 300);
     return steps;
   }
   const normal = airtime(false);
@@ -289,8 +293,10 @@ test('R2.8: the next obstacle waits until the last one has opened its gap', () =
 });
 
 test('R2.8: a simple jump-timing bot survives 30 seconds (gaps are fair)', () => {
-  // The bot only jumps, at the best moment for the next obstacle. If the gaps were
-  // too small to land and jump again, or a group too wide to clear, it would crash.
+  // The bot only jumps. It takes off as EARLY as still clears the obstacle, which lands
+  // it sooner and leaves the most time for the next jump (a good human does the same).
+  // If the gaps were too small to land and jump again, or a group too wide to clear,
+  // it would crash.
   for (const seed of [1, 2, 3, 4, 5]) {
     const g = startedGame({ rng: seededRng(seed) });
     for (let i = 0; i < 30 * 60 && g.status === 'running'; i++) {
@@ -298,9 +304,13 @@ test('R2.8: a simple jump-timing bot survives 30 seconds (gaps are fair)', () =>
       if (next && g.dino.y === 0 && next.type !== 'bird') {
         // Seconds the obstacle spends overlapping the dinosaur's box (x 54..90).
         const overlapTime = (next.w + 36) / g.speed;
-        // Best take-off: the middle of the airborne window is 0.278 s after take-off.
-        const distanceToTouch = next.x - 90;
-        if (distanceToTouch <= g.speed * (0.278 - overlapTime / 2)) G.press(g, 'jump');
+        // The dinosaur clears it while its height is at least (cactus height - 4).
+        // That is true until `latest` seconds after take-off (from y = 600t - 1080t^2).
+        const need = next.h - 4;
+        const latest = (600 + Math.sqrt(600 * 600 - 2 * 2160 * need)) / 2160;
+        // Arrive just before the window closes, with 0.03 s (two frames) to spare.
+        const arrival = latest - overlapTime - 0.03;
+        if (next.x - 90 <= g.speed * arrival) G.press(g, 'jump');
       }
       G.update(g, STEP);
     }
