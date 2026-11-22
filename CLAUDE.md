@@ -47,3 +47,24 @@ would not put on a public web page. These repositories are public."
   short message saying what changed. Do not batch unrelated changes together.
 - Never push. I decide what gets pushed and when. Do not run `git push`, add
   remotes, or create GitHub repos unless I ask.
+
+## This project (webapp-game): standing rules
+
+- **Run the tests with** `node --test "tests/**/*.test.js"` (keep the quotes). On Node 24,
+  `node --test tests/` finds nothing. Node's built-in runner is the standard test tool
+  here, so use it instead of `pytest`.
+- **`spec.md` is the source of truth.** Every requirement in `problem.md` is broken into
+  numbered checks there (R2.3, ...). When a rule or a number changes, change `spec.md`,
+  the tests and the code in the same step.
+- **Name the ID in every test.** Each test title starts with a spec ID, like `"R2.3: ..."`.
+  `tests/traceability.test.js` fails if a spec ID has no test or a test has no valid ID.
+- **Decision records** go in `docs/decisions/` as numbered Y-statements (`0004-...`, next).
+  Write one only for a decision that had real alternatives.
+- **Code layout:** `game.js` (rules, no drawing), `storage.js` (high score), `main.js`
+  (browser: drawing and input). Each file is a plain script wrapped in a function that
+  exports with `module.exports` in Node and `window.X` in a browser (ADR 0001). Keep new
+  files in that style, and never use `import`/`export`: they do not work from `file://`.
+- **Rules code never touches the browser.** Inject the random source (`rng`) and the store
+  so tests can fake them. Heights in `game.js` are measured up from the ground.
+- **Do not commit `NEXT-SESSION.md`** (it is hidden by `.git/info/exclude`).
+- Git prints "LF will be replaced by CRLF" warnings on this machine. They are harmless.
